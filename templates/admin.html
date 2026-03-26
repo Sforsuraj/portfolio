@@ -1,0 +1,461 @@
+{% extends "base.html" %}
+
+{% block nav %}
+<header class="nav">
+    <div class="nav-inner" style="justify-content: space-between;">
+        <div class="nav-left">
+            <span class="nav-logo-indicator" style="background: var(--green);"></span>
+            <span class="nav-logo-text">SK.DEV <span class="nav-logo-sub">ADMIN</span></span>
+        </div>
+        <div class="nav-right">
+            {% if logged_in %}
+            <a href="{{ url_for('admin_logout') }}" class="btn btn-primary" style="margin-right: 16px;">LOG OUT</a>
+            {% endif %}
+            <a href="{{ url_for('index') }}" class="btn btn-outline">RETURN TO SITE</a>
+        </div>
+    </div>
+</header>
+{% endblock %}
+
+{% block content %}
+<section class="section admin-section">
+    <div class="container">
+        <div class="section-header">
+            <div class="section-label">// ADMIN — CONSOLE</div>
+            <h2 class="section-title">Admin Dashboard</h2>
+            <div class="section-divider"></div>
+        </div>
+
+        {% if not logged_in %}
+        <div class="admin-login-card">
+            <form method="post" action="{{ url_for('admin_login') }}">
+                <div class="form-field">
+                    <label for="password">ADMIN PASSWORD</label>
+                    <input id="password" name="password" type="password" autocomplete="current-password" required />
+                </div>
+                <button type="submit" class="btn-submit">LOGIN</button>
+            </form>
+            {% if error %}
+            <div class="form-error">{{ error }}</div>
+            {% endif %}
+        </div>
+        {% else %}
+        <div class="admin-toolbar" style="display: flex; justify-content: space-between; margin-bottom: 24px;">
+            <div class="admin-status">
+                <span class="status-dot"></span>
+                <span class="status-text">ADMIN ONLINE</span>
+            </div>
+        </div>
+
+        <div class="admin-dashboard">
+            <!-- Flash Messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+              {% if messages %}
+                <div id="flash-container" style="position: fixed; top: 120px; right: 20px; z-index: 1000; display: flex; flex-direction: column; gap: 10px;">
+                {% for category, message in messages %}
+                  <div class="flash-msg" style="padding: 12px 20px; background: {{ '#1a3320' if category == 'success' else '#331a1a' }}; border-left: 4px solid {{ 'var(--green)' if category == 'success' else 'var(--error)' }}; color: {{ 'var(--green)' if category == 'success' else 'var(--error)' }}; min-width: 250px; font-size: 14px; box-shadow: 0 4px 6px rgba(0,0,0,0.5);">
+                    {{ message }}
+                  </div>
+                {% endfor %}
+                </div>
+                <script>
+                  setTimeout(() => {
+                    const fc = document.getElementById('flash-container');
+                    if (fc) fc.style.display = 'none';
+                  }, 3000);
+                </script>
+              {% endif %}
+            {% endwith %}
+
+            <div class="admin-sidebar" id="admin-tabs">
+                <button class="admin-nav-item active" data-tab="messages">Messages</button>
+                <button class="admin-nav-item" data-tab="profile">Profile & Settings</button>
+                <button class="admin-nav-item" data-tab="projects">Projects</button>
+                <button class="admin-nav-item" data-tab="skills">Skills</button>
+                <button class="admin-nav-item" data-tab="experience">Experience</button>
+                <button class="admin-nav-item" data-tab="education">Education</button>
+                <button class="admin-nav-item" data-tab="achievements">Achievements</button>
+                <button class="admin-nav-item" data-tab="extra">Certs & Coursework</button>
+            </div>
+
+            <div class="admin-main">
+                <!-- Messages Tab -->
+                <div class="admin-content-pane active" id="tab-messages">
+                    <div class="admin-card">
+                        <h3 class="admin-card-title">Recent Messages</h3>
+                        <div class="admin-table-wrapper">
+                            <table class="admin-table">
+                                <thead>
+                                    <tr>
+                                        <th><input type="checkbox" id="selectAll" onclick="toggleAll(this)"></th>
+                                        <th>NAME</th>
+                                        <th>EMAIL</th>
+                                        <th>SUBJECT</th>
+                                        <th>DATE</th>
+                                        <th>STATUS</th>
+                                        <th>ACTIONS</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for m in messages %}
+                                    <tr data-id="{{ m.id }}" style="{{ 'background: #161616;' if not m.read else 'background: #111;' }}">
+                                        <td><input type="checkbox" class="msg-check" value="{{ m.id }}"></td>
+                                        <td>{{ m.name }}</td>
+                                        <td>{{ m.email }}</td>
+                                        <td>{{ m.subject[:50] + '...' if m.subject|length > 50 else m.subject }}</td>
+                                        <td>{{ m.timestamp.strftime('%b %d, %Y %H:%M') }}</td>
+                                        <td style="{{ 'color: var(--green);' if not m.read else 'color: #555;' }}">
+                                            {{ '● UNREAD' if not m.read else '○ READ' }}
+                                        </td>
+                                        <td class="admin-actions">
+                                            <a href="{{ url_for('admin_message_view', id=m.id) }}" class="tag-pill admin-action" style="text-decoration:none;">VIEW</a>
+                                            <button type="button" class="tag-pill admin-action" onclick="toggleRead({{ m.id }})">TOGGLE</button>
+                                            <form method="post" action="{{ url_for('admin_messages_delete', id=m.id) }}" style="display:inline;" onsubmit="return confirm('Delete this message?')">
+                                                <button type="submit" class="tag-pill" style="color:#ff4444;border-color:#ff4444;cursor:pointer;">DELETE</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                    {% else %}
+                                    <tr><td colspan="5" class="admin-empty">No messages yet.</td></tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Profile Tab -->
+                <div class="admin-content-pane" id="tab-profile">
+                    <div class="admin-card">
+                        <h3 class="admin-card-title">Core Profile Settings</h3>
+                        <div class="admin-profile-list">
+                            {% for entry in profile_entries %}
+                            <form action="{{ url_for('admin_profile_update') }}" method="post" class="admin-item-row">
+                                <input type="hidden" name="key" value="{{ entry.key }}">
+                                <div class="admin-item-info">
+                                    <span class="admin-item-subtitle">{{ entry.key.upper() }}</span>
+                                    <input type="text" name="value" value="{{ entry.value }}" class="admin-input-inline">
+                                </div>
+                                <button type="submit" class="tag-pill">SAVE</button>
+                            </form>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Projects Tab -->
+                <div class="admin-content-pane" id="tab-projects">
+                    <div class="admin-card">
+                        <h3 class="admin-card-title">Add New Project</h3>
+                        <form action="{{ url_for('admin_projects_add') }}" method="post" class="admin-form">
+                            <div class="form-field full-width"><label>NAME</label><input type="text" name="name" required></div>
+                            <div class="form-field full-width"><label>DESCRIPTION</label><textarea name="description" rows="2" required></textarea></div>
+                            <div class="form-field"><label>TAGS (CSV)</label><input type="text" name="tags" placeholder="PYTHON, ML, WEB"></div>
+                            <div class="form-field"><label>DATE</label><input type="text" name="date" placeholder="Mar 2025"></div>
+                            <div class="form-field"><label>CATEGORY</label><input type="text" name="category" placeholder="ML"></div>
+                            <div class="form-field"><label>DOT COLOR</label><input type="text" name="dot" placeholder="green"></div>
+                            <div class="form-field"><label>GITHUB URL</label><input type="url" name="github_url" placeholder="https://github.com/..."></div>
+                            <div class="form-field"><label>VIEW URL</label><input type="url" name="view_url" placeholder="https://..."></div>
+                            <div class="form-field"><label>ORDER</label><input type="number" name="order" value="0"></div>
+                            <div class="admin-btn-row"><button type="submit" class="btn btn-primary nav-cta">ADD PROJECT</button></div>
+                        </form>
+                    </div>
+                    <div class="admin-card">
+                        <h3 class="admin-card-title">Existing Projects</h3>
+                        {% for p in projects %}
+                        <div class="admin-item-row" style="flex-wrap: wrap; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dashed #333; padding: 12px 0;">
+                            <div class="admin-item-info" style="flex: 1; min-width: 200px;">
+                                <span class="admin-item-title">{{ p.name }}</span>
+                                <span class="admin-item-subtitle">{{ p.category }} | {{ p.date }}</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <a href="{{ url_for('admin_projects_edit', id=p.id) }}" class="tag-pill" style="text-decoration: none; cursor:pointer;">EDIT</a>
+                                <form method="post" action="{{ url_for('admin_projects_delete', id=p.id) }}" style="display:inline;" onsubmit="return confirm('Delete this project?')">
+                                    <button type="submit" class="tag-pill" style="color:#ff4444;border-color:#ff4444;cursor:pointer;">DELETE</button>
+                                </form>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Skills Tab -->
+                <div class="admin-content-pane" id="tab-skills">
+                    <div class="admin-card">
+                        <h3 class="admin-card-title">Add Skill</h3>
+                        <form action="{{ url_for('admin_skills_add') }}" method="post" class="admin-form">
+                            <div class="form-field"><label>NAME</label><input type="text" name="name" required></div>
+                            <div class="form-field"><label>CATEGORY</label>
+                                <select name="category">
+                                    <option value="LANGUAGES">LANGUAGES</option>
+                                    <option value="ML_AI">ML / AI</option>
+                                    <option value="TOOLS">TOOLS</option>
+                                    <option value="DATABASES">DATABASES</option>
+                                </select>
+                            </div>
+                            <div class="form-field"><label>LEVEL (0-100)</label><input type="number" name="level" value="80"></div>
+                            <div class="form-field"><label>ORDER</label><input type="number" name="order" value="0"></div>
+                            <div class="admin-btn-row"><button type="submit" class="btn btn-primary nav-cta">ADD SKILL</button></div>
+                        </form>
+                    </div>
+                    {% for cat in ['LANGUAGES', 'ML_AI', 'TOOLS', 'DATABASES'] %}
+                    <div class="admin-card">
+                        <h3 class="admin-card-title">{{ cat }}</h3>
+                        {% for s in skills if s.category == cat %}
+                        <div class="admin-item-row" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dashed #333; padding: 12px 0;">
+                            <div class="admin-item-info">
+                                <span class="admin-item-title">{{ s.name }}</span>
+                                <span class="admin-item-subtitle">Level: {{ s.level }}%</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <a href="{{ url_for('admin_generic_edit', model_type='skill', item_id=s.id) }}" class="tag-pill" style="text-decoration: none; cursor:pointer;">EDIT</a>
+                                <form method="post" action="{{ url_for('admin_skills_delete', id=s.id) }}" style="display:inline;" onsubmit="return confirm('Delete this skill?')">
+                                    <button type="submit" class="tag-pill" style="color:#ff4444;border-color:#ff4444;cursor:pointer;">DELETE</button>
+                                </form>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Experience Tab -->
+                <div class="admin-content-pane" id="tab-experience">
+                    <div class="admin-card">
+                        <h3 class="admin-card-title">Add Experience</h3>
+                        <form action="{{ url_for('admin_experience_add') }}" method="post" class="admin-form">
+                            <div class="form-field"><label>COMPANY</label><input type="text" name="company" required></div>
+                            <div class="form-field"><label>ROLE</label><input type="text" name="role" required></div>
+                            <div class="form-field"><label>DATE RANGE</label><input type="text" name="date_range" required></div>
+                            <div class="form-field"><label>LOCATION</label><input type="text" name="location"></div>
+                            <div class="form-field full-width"><label>POINTS (ONE PER LINE)</label><textarea name="points" rows="3"></textarea></div>
+                            <div class="form-field full-width"><label>TAGS (CSV)</label><input type="text" name="tags"></div>
+                            <div class="admin-btn-row"><button type="submit" class="btn btn-primary nav-cta">ADD EXP</button></div>
+                        </form>
+                    </div>
+                    {% for ex in experience %}
+                    <div class="admin-card">
+                        <div class="admin-item-row" style="display: flex; justify-content: space-between; align-items: center; padding: 4px;">
+                            <div class="admin-item-info">
+                                <span class="admin-item-title">{{ ex.company }}</span>
+                                <span class="admin-item-subtitle">{{ ex.role }}</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <a href="{{ url_for('admin_generic_edit', model_type='experience', item_id=ex.id) }}" class="tag-pill" style="text-decoration: none; cursor:pointer;">EDIT</a>
+                                <form method="post" action="{{ url_for('admin_generic_delete', model_type='experience', item_id=ex.id) }}" style="display:inline;" onsubmit="return confirm('Delete this experience?')">
+                                    <button type="submit" class="tag-pill" style="color:#ff4444;border-color:#ff4444;cursor:pointer;">DELETE</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Education Tab -->
+                <div class="admin-content-pane" id="tab-education">
+                    <div class="admin-card">
+                        <h3 class="admin-card-title">Add Education</h3>
+                        <form action="{{ url_for('admin_education_add') }}" method="post" class="admin-form">
+                            <div class="form-field"><label>YEAR</label><input type="text" name="year" required></div>
+                            <div class="form-field"><label>TITLE</label><input type="text" name="title" required></div>
+                            <div class="form-field full-width"><label>INSTITUTION</label><input type="text" name="institution" required></div>
+                            <div class="form-field"><label>META (CGPA/%)</label><input type="text" name="meta"></div>
+                            <div class="admin-btn-row"><button type="submit" class="btn btn-primary nav-cta">ADD EDU</button></div>
+                        </form>
+                    </div>
+                    {% for e in education %}
+                    <div class="admin-card">
+                        <div class="admin-item-row" style="display: flex; justify-content: space-between; align-items: center; padding: 4px;">
+                            <div class="admin-item-info">
+                                <span class="admin-item-title">{{ e.title }}</span>
+                                <span class="admin-item-subtitle">{{ e.institution }} | {{ e.year }}</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <a href="{{ url_for('admin_generic_edit', model_type='education', item_id=e.id) }}" class="tag-pill" style="text-decoration: none; cursor:pointer;">EDIT</a>
+                                <form method="post" action="{{ url_for('admin_generic_delete', model_type='education', item_id=e.id) }}" style="display:inline;" onsubmit="return confirm('Delete this education?')">
+                                    <button type="submit" class="tag-pill" style="color:#ff4444;border-color:#ff4444;cursor:pointer;">DELETE</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Achievements Tab -->
+                <div class="admin-content-pane" id="tab-achievements">
+                    <div class="admin-card">
+                        <h3 class="admin-card-title">Add Achievement</h3>
+                        <form action="{{ url_for('admin_achievement_add') }}" method="post" class="admin-form">
+                            <div class="form-field"><label>NUMBER (e.01)</label><input type="text" name="num" required></div>
+                            <div class="form-field"><label>BADGE CLASS</label>
+                                <select name="badge">
+                                    <option value="badge-gold">GOLD</option>
+                                    <option value="badge-cert">CERT</option>
+                                    <option value="badge-award">AWARD</option>
+                                    <option value="badge-vol">VOL</option>
+                                    <option value="badge-amb">AMB</option>
+                                </select>
+                            </div>
+                            <div class="form-field full-width"><label>TEXT</label><input type="text" name="text" required></div>
+                            <div class="admin-btn-row"><button type="submit" class="btn btn-primary nav-cta">ADD</button></div>
+                        </form>
+                    </div>
+                    <div class="admin-card">
+                        {% for a in achievements %}
+                        <div class="admin-item-row" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dashed #333; padding: 12px 0;">
+                            <div class="admin-item-info">
+                                <span class="admin-item-title">{{ a.text }}</span>
+                                <span class="admin-item-subtitle">{{ a.num }} | {{ a.badge }}</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <a href="{{ url_for('admin_generic_edit', model_type='achievement', item_id=a.id) }}" class="tag-pill" style="text-decoration: none; cursor:pointer;">EDIT</a>
+                                <form method="post" action="{{ url_for('admin_generic_delete', model_type='achievement', item_id=a.id) }}" style="display:inline;" onsubmit="return confirm('Delete this achievement?')">
+                                    <button type="submit" class="tag-pill" style="color:#ff4444;border-color:#ff4444;cursor:pointer;">DELETE</button>
+                                </form>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Extra Tab (Certs & Coursework) -->
+                <div class="admin-content-pane" id="tab-extra">
+                    <div class="admin-card">
+                        <h3 class="admin-card-title">Add Certification</h3>
+                        <form action="{{ url_for('admin_certification_add') }}" method="post" class="admin-form">
+                            <div class="form-field"><label>TITLE</label><input type="text" name="title" required></div>
+                            <div class="form-field"><label>META</label><input type="text" name="meta"></div>
+                            <div class="form-field full-width"><label>DESCRIPTION</label><input type="text" name="text" required></div>
+                            <div class="admin-btn-row"><button type="submit" class="btn btn-primary nav-cta">ADD CERT</button></div>
+                        </form>
+                    </div>
+                    <div class="admin-card">
+                        <h3 class="admin-card-title">Add Coursework</h3>
+                        <form action="{{ url_for('admin_coursework_add') }}" method="post" class="admin-form">
+                            <div class="form-field full-width"><label>NAME</label><input type="text" name="name" required></div>
+                            <div class="admin-btn-row"><button type="submit" class="btn btn-primary nav-cta">ADD COURSE</button></div>
+                        </form>
+                    </div>
+                    
+                    <div class="admin-card">
+                        <h3 class="admin-card-title">Existing Certifications</h3>
+                        {% for c in certifications %}
+                        <div class="admin-item-row" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dashed #333; padding: 12px 0;">
+                            <div class="admin-item-info">
+                                <span class="admin-item-title">{{ c.title }}</span>
+                                <span class="admin-item-subtitle">{{ c.meta }}</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <a href="{{ url_for('admin_generic_edit', model_type='certification', item_id=c.id) }}" class="tag-pill" style="text-decoration: none; cursor:pointer;">EDIT</a>
+                                <form method="post" action="{{ url_for('admin_generic_delete', model_type='certification', item_id=c.id) }}" style="display:inline;" onsubmit="return confirm('Delete this cert?')">
+                                    <button type="submit" class="tag-pill" style="color:#ff4444;border-color:#ff4444;cursor:pointer;">DELETE</button>
+                                </form>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="admin-card">
+                        <h3 class="admin-card-title">Existing Coursework</h3>
+                        {% for cw in coursework %}
+                        <div class="admin-item-row" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dashed #333; padding: 12px 0;">
+                            <div class="admin-item-info">
+                                <span class="admin-item-title">{{ cw.name }}</span>
+                                <span class="admin-item-subtitle">Order: {{ cw.order }}</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <a href="{{ url_for('admin_generic_edit', model_type='coursework', item_id=cw.id) }}" class="tag-pill" style="text-decoration: none; cursor:pointer;">EDIT</a>
+                                <form method="post" action="{{ url_for('admin_generic_delete', model_type='coursework', item_id=cw.id) }}" style="display:inline;" onsubmit="return confirm('Delete this coursework?')">
+                                    <button type="submit" class="tag-pill" style="color:#ff4444;border-color:#ff4444;cursor:pointer;">DELETE</button>
+                                </form>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<style>
+.admin-input-inline {
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid #222;
+    color: var(--text-bright);
+    font-size: 13px;
+    width: 300px;
+    padding: 2px 4px;
+}
+.admin-input-inline:focus {
+    border-color: var(--green);
+    outline: none;
+}
+</style>
+
+<script>
+// Tab Switching
+document.querySelectorAll('.admin-nav-item').forEach(button => {
+    button.addEventListener('click', () => {
+        const tab = button.dataset.tab;
+        
+        // Update buttons
+        document.querySelectorAll('.admin-nav-item').forEach(b => b.classList.remove('active'));
+        button.classList.add('active');
+        
+        // Update panes
+        document.querySelectorAll('.admin-content-pane').forEach(p => p.classList.remove('active'));
+        document.getElementById(`tab-${tab}`).classList.add('active');
+    });
+});
+
+// Bulk Actions
+function toggleAll(source) {
+    const checkboxes = document.querySelectorAll('.msg-check');
+    checkboxes.forEach(cb => cb.checked = source.checked);
+}
+
+async function applyBulkAction() {
+    const action = document.getElementById('bulk-action-select').value;
+    if (!action) return;
+    const checkboxes = document.querySelectorAll('.msg-check:checked');
+    const ids = Array.from(checkboxes).map(cb => parseInt(cb.value));
+    if (ids.length === 0) {
+        alert("Select at least one message");
+        return;
+    }
+    if (action === 'delete' && !confirm(`Delete ${ids.length} messages?`)) return;
+
+    try {
+        const res = await fetch('/admin/bulk-action', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({action, ids})
+        });
+        if (res.ok) {
+            window.location.href = '/admin';
+        } else {
+            alert('Bulk Action Error: ' + await res.text());
+        }
+    } catch (e) {
+        alert('Bulk Action Network Error: ' + e);
+        console.error(e);
+    }
+}
+
+async function toggleRead(id) {
+    try {
+        const res = await fetch(`/admin/message/${id}/read`, { method: 'POST' });
+        if (res.ok) window.location.href = '/admin';
+        else alert('Toggle error: ' + await res.text());
+    } catch (e) {
+        alert(e);
+    }
+}
+
+</script>
+{% endblock %}
+

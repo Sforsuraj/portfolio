@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block nav %}
+<header class="nav">
+    <div class="nav-inner" style="justify-content: space-between;">
+        <div class="nav-left">
+            <span class="nav-logo-indicator" style="background: var(--green);"></span>
+            <span class="nav-logo-text">SK.DEV <span class="nav-logo-sub">ADMIN</span></span>
+        </div>
+        <div class="nav-right">
+            <a href="{{ url_for('admin') }}" class="btn btn-outline" style="margin-right: 16px;">RETURN TO ADMIN</a>
+            <a href="{{ url_for('admin_logout') }}" class="btn btn-primary">LOG OUT</a>
+        </div>
+    </div>
+</header>
+{% endblock %}
+
+{% block content %}
+<section class="section admin-section" style="padding-top: 120px;">
+    <div class="container">
+        <div class="section-header">
+            <div class="section-label">// PROJECTS EDITOR</div>
+            <h2 class="section-title">Modify Data Node</h2>
+            <div class="section-divider"></div>
+        </div>
+
+        <div class="admin-card" style="margin-top: 32px;">
+            <form action="{{ url_for('admin_projects_edit', id=p.id) }}" method="post" class="admin-form">
+                <div class="form-field full-width">
+                    <label>NAME</label>
+                    <input type="text" name="name" value="{{ p.name }}" required>
+                </div>
+                <div class="form-field full-width">
+                    <label>DESCRIPTION</label>
+                    <textarea name="description" rows="4" required>{{ p.description }}</textarea>
+                </div>
+                <div class="form-field">
+                    <label>TAGS (CSV)</label>
+                    <input type="text" name="tags" value="{{ p.tags }}">
+                </div>
+                <div class="form-field">
+                    <label>DATE</label>
+                    <input type="text" name="date" value="{{ p.date }}">
+                </div>
+                <div class="form-field">
+                    <label>CATEGORY</label>
+                    <input type="text" name="category" value="{{ p.category }}">
+                </div>
+                <div class="form-field">
+                    <label>DOT COLOR</label>
+                    <input type="text" name="dot" value="{{ p.dot }}">
+                </div>
+                <div class="form-field">
+                    <label>GITHUB URL</label>
+                    <input type="url" name="github_url" value="{{ p.github_url or '' }}">
+                </div>
+                <div class="form-field">
+                    <label>VIEW URL</label>
+                    <input type="url" name="view_url" value="{{ p.view_url or '' }}">
+                </div>
+                <div class="form-field">
+                    <label>ORDER</label>
+                    <input type="number" name="order" value="{{ p.order }}">
+                </div>
+                
+                <div class="admin-btn-row">
+                    <button type="submit" class="btn btn-primary">UPDATE PROJECT</button>
+                    <a href="{{ url_for('admin') }}" class="btn btn-outline" style="border-color: #444; color: #aaa;">CANCEL</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}

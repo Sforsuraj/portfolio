@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="section" style="min-height: 80vh; display: flex; align-items: center; justify-content: center; text-align: center;">
+    <div class="container">
+        <h1 style="font-size: 120px; color: var(--error); margin-bottom: 16px; letter-spacing: -4px;">500</h1>
+        <div class="section-label" style="justify-content: center; margin-bottom: 32px;">// 500 — SERVER OVERLOAD</div>
+        <p style="color: #a0a0a0; max-width: 400px; margin: 0 auto 32px;">A critical exception occurred within the core routines. The system encountered an unexpected structural failure.</p>
+        <a href="{{ url_for('index') }}" class="btn btn-outline" style="border-color: var(--error); color: var(--error);">SYSTEM RESTART</a>
+    </div>
+</section>
+{% endblock %}

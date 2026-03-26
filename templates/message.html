@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block nav %}
+<header class="nav">
+    <div class="nav-inner" style="justify-content: space-between;">
+        <div class="nav-left">
+            <span class="nav-logo-indicator" style="background: var(--green);"></span>
+            <span class="nav-logo-text">SURAJ_OS <span class="nav-logo-sub">ADMIN</span></span>
+        </div>
+        <div class="nav-right">
+            <a href="{{ url_for('admin') }}" class="btn btn-outline" style="margin-right: 16px;">RETURN TO ADMIN</a>
+            <a href="{{ url_for('admin_logout') }}" class="btn btn-primary">LOGOUT</a>
+        </div>
+    </div>
+</header>
+{% endblock %}
+
+{% block content %}
+<section class="section admin-section" style="padding-top: 120px;">
+    <div class="container">
+        <div class="section-header">
+            <div class="section-label">// MESSAGE VIEWER</div>
+            <h2 class="section-title">Incoming Transmission</h2>
+            <div class="section-divider"></div>
+        </div>
+
+        <div class="admin-card" style="margin-top: 32px; padding: 32px;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px;">
+                <div>
+                    <h3 style="color: #fff; font-size: 24px; margin-bottom: 8px;">{{ message.subject }}</h3>
+                    <div style="color: #a0a0a0; font-size: 14px;">
+                        From: <strong style="color: var(--green);">{{ message.name }}</strong> ({{ message.email }})
+                    </div>
+                </div>
+                <div style="color: #666; font-size: 14px;">
+                    {{ message.timestamp.strftime('%b %d, %Y %H:%M') }}
+                </div>
+            </div>
+            
+            <div style="border-left: 2px solid #333; padding-left: 20px; color: #e8e8e8; line-height: 1.6; white-space: pre-wrap; font-size: 16px; margin-bottom: 32px;">{{ message.message }}</div>
+            
+            <div style="display: flex; gap: 16px; border-top: 1px solid #222; padding-top: 24px;">
+                <form action="{{ url_for('admin_messages_delete', id=message.id) }}" method="post" onsubmit="return confirm('Delete this message?')">
+                    <button type="submit" class="btn btn-outline delete" style="color: var(--error); border-color: var(--error); cursor:pointer;">DELETE MESSAGE</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    .delete:hover {
+        background: var(--error) !important;
+        color: #fff !important;
+    }
+</style>
+
+{% endblock %}

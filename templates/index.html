@@ -1,0 +1,365 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section id="home" class="section hero-section">
+    <div class="container hero-container">
+        <div class="hero-left">
+            <div class="hero-init-label typewriter-sequence" data-sequence="&gt; INITIALIZING PORTFOLIO..."></div>
+            <div class="hero-name">
+                <div class="hero-name-line">
+                    <span class="hero-name-word">{{ profile.get('name', 'SURAJ KUMAR') }}</span>
+                </div>
+            </div>
+            <div class="hero-name-underline"></div>
+            <div class="hero-role typewriter-role" data-text="{{ profile.get('role', 'B.Tech AI & Data Science Engineer') }}"></div>
+            <p class="hero-bio">
+                {{ profile.get('bio_hero', '') }}
+            </p>
+
+            <div class="hero-stats">
+                <div class="hero-stat">
+                    <div class="hero-stat-number" data-target="{{ profile.get('stat_proj', '0') }}">0</div>
+                    <div class="hero-stat-label">PROJ</div>
+                </div>
+                <div class="hero-stat">
+                    <div class="hero-stat-number" data-target="{{ profile.get('stat_inter', '0') }}">0</div>
+                    <div class="hero-stat-label">INTER</div>
+                </div>
+                <div class="hero-stat">
+                    <div class="hero-stat-number" data-target="{{ profile.get('stat_cgpa', '0') }}" data-decimals="2">0</div>
+                    <div class="hero-stat-label">CGPA</div>
+                </div>
+                <div class="hero-stat">
+                    <div class="hero-stat-number" data-target="{{ profile.get('stat_award', '0') }}">0</div>
+                    <div class="hero-stat-label">AWARD</div>
+                </div>
+            </div>
+
+            <div class="hero-actions">
+                <a href="#projects" class="btn btn-primary">VIEW PROJECTS</a>
+                <a href="#contact" class="btn btn-outline">CONTACT ME</a>
+            </div>
+
+            <div class="hero-social">
+                <a href="{{ profile.get('github', '#') }}" target="_blank" rel="noreferrer">GitHub</a>
+                <a href="{{ profile.get('linkedin', '#') }}" target="_blank" rel="noreferrer">LinkedIn</a>
+                <a href="mailto:{{ profile.get('email', '') }}">Email</a>
+            </div>
+        </div>
+
+        <div class="hero-right">
+            <div id="hero-3d-container" class="hero-3d-container"></div>
+        </div>
+    </div>
+
+    <div class="hero-scroll-indicator">
+        <span class="scroll-label">SCROLL</span>
+        <span class="scroll-arrow">↓</span>
+    </div>
+</section>
+
+<section id="about" class="section section-about reveal">
+    <div class="container">
+        <div class="section-header">
+            <div class="section-label">// 01 — ABOUT</div>
+            <h2 class="section-title">About {{ profile.get('name', 'Suraj Kumar') }}</h2>
+            <div class="section-divider"></div>
+        </div>
+        <div class="about-grid">
+            <div class="about-left">
+                <div class="about-card">
+                    <div class="avatar-wrapper">
+                        <div class="avatar-border">
+                            <img
+                                src="{{ url_for('static', filename='img/suraj-profile.jpg') }}"
+                                alt="Suraj Kumar"
+                                class="avatar-photo"
+                            />
+                        </div>
+                    </div>
+                    <div class="about-name">{{ profile.get('name', 'SURAJ KUMAR') }}</div>
+                    <div class="about-role">{{ profile.get('role', 'AI & DS Engineer') }}</div>
+                    <div class="about-divider"></div>
+                    <div class="about-info-grid">
+                        <div class="info-row">
+                            <div class="info-key">CGPA</div>
+                            <div class="info-value">{{ profile.get('stat_cgpa', '0') }}</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-key">BATCH</div>
+                            <div class="info-value">{{ profile.get('about_batch', '') }}</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-key">COLLEGE</div>
+                            <div class="info-value">{{ profile.get('about_college', '') }}</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-key">LOCATION</div>
+                            <div class="info-value">{{ profile.get('about_location', '') }}</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-key">EMAIL</div>
+                            <div class="info-value">{{ profile.get('email', '') }}</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-key">GITHUB</div>
+                            <div class="info-value">/{{ profile.get('github', '').split('/')[-1] }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="about-right">
+                <p class="about-bio">
+                    {{ profile.get('bio_about_1', '') }}
+                </p>
+                <p class="about-bio">
+                    {{ profile.get('bio_about_2', '') }}
+                </p>
+
+                <div class="about-education">
+                    <div class="subsection-label">// EDUCATION</div>
+
+                    {% for e in education %}
+                    <div class="education-card">
+                        <div class="education-top">
+                            <span class="education-year">{{ e.year }}</span>
+                        </div>
+                        <div class="education-title">{{ e.title }}</div>
+                        <div class="education-inst">{{ e.institution }}</div>
+                        <div class="education-meta">{{ e.meta }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="experience" class="section section-experience reveal">
+    <div class="container">
+        <div class="section-header">
+            <div class="section-label">// 02 — EXPERIENCE</div>
+            <h2 class="section-title">Industry Experience</h2>
+            <div class="section-divider"></div>
+        </div>
+        <div class="experience-grid">
+            {% for ex in experience %}
+            <div class="experience-card">
+                <div class="experience-top">
+                    <div class="experience-company">{{ ex.company }}</div>
+                    <div class="experience-date">{{ ex.date_range }}</div>
+                </div>
+                <div class="experience-role">{{ ex.role }}</div>
+                <div class="experience-location">{{ ex.location }}</div>
+                <div class="experience-divider"></div>
+                <div class="experience-points">
+                    {% for p in ex.points.split('\n') %}
+                    <p><span class="arrow">→</span> {{ p }}</p>
+                    {% endfor %}
+                </div>
+                <div class="experience-tags">
+                    {% if ex.tags %}
+                    {% for t in ex.tags.split(',') %}
+                    <span class="tag-pill">{{ t.strip() }}</span>
+                    {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<section id="projects" class="section section-projects reveal">
+    <div class="container">
+        <div class="section-header">
+            <div class="section-label">// 03 — PROJECTS</div>
+            <h2 class="section-title">Selected Work</h2>
+            <div class="section-divider"></div>
+        </div>
+
+        <div class="projects-filter">
+            <span class="filter-label">$ ls ./projects --filter</span>
+            <div class="filter-buttons">
+                <button class="filter-btn active" data-tag="ALL">ALL</button>
+                <button class="filter-btn" data-tag="PYTHON">PYTHON</button>
+                <button class="filter-btn" data-tag="WEB">WEB</button>
+                <button class="filter-btn" data-tag="ML">ML</button>
+                <button class="filter-btn" data-tag="DATABASE">DATABASE</button>
+            </div>
+        </div>
+
+        <div class="projects-grid" id="projects-grid">
+            <!-- Filled by JS via /api/projects -->
+        </div>
+    </div>
+</section>
+
+<section id="skills" class="section section-skills reveal">
+    <div class="container">
+        <div class="section-header">
+            <div class="section-label">// 04 — SKILLS</div>
+            <h2 class="section-title">Technical Stack</h2>
+            <div class="section-divider"></div>
+        </div>
+        <div class="skills-grid">
+            <div class="skills-left">
+                <div class="skill-group" data-group="LANGUAGES">
+                    <button class="skill-group-header">
+                        <span>LANGUAGES</span>
+                        <span class="skill-toggle">−</span>
+                    </button>
+                    <div class="skill-group-body">
+                        <!-- Filled from /api/skills -->
+                    </div>
+                </div>
+                <div class="skill-group" data-group="ML_AI">
+                    <button class="skill-group-header">
+                        <span>ML / AI</span>
+                        <span class="skill-toggle">−</span>
+                    </button>
+                    <div class="skill-group-body"></div>
+                </div>
+                <div class="skill-group" data-group="TOOLS">
+                    <button class="skill-group-header">
+                        <span>TOOLS</span>
+                        <span class="skill-toggle">−</span>
+                    </button>
+                    <div class="skill-group-body"></div>
+                </div>
+                <div class="skill-group" data-group="DATABASES">
+                    <button class="skill-group-header">
+                        <span>DATABASES</span>
+                        <span class="skill-toggle">−</span>
+                    </button>
+                    <div class="skill-group-body"></div>
+                </div>
+            </div>
+            <div class="skills-right">
+                <div id="skills-orbs-container" class="skills-orbs-container"></div>
+                <div class="subsection-label">// CERTIFICATIONS</div>
+                {% for c in certifications %}
+                <div class="cert-card">
+                    <div class="cert-title">✓ {{ c.title }}</div>
+                    <div class="cert-text">{{ c.text }}</div>
+                    <div class="cert-meta">{{ c.meta }}</div>
+                </div>
+                {% endfor %}
+
+                <div class="subsection-label soft-label">// SOFT SKILLS</div>
+                <div class="soft-grid">
+                    <span class="tag-pill">Problem Solving</span>
+                    <span class="tag-pill">Critical Thinking</span>
+                    <span class="tag-pill">Self-Learning</span>
+                    <span class="tag-pill">Presentation</span>
+                    <span class="tag-pill">Adaptability</span>
+                    <span class="tag-pill">Team Player</span>
+                    <span class="tag-pill">Networking</span>
+                </div>
+
+                <div class="subsection-label coursework-label">// COURSEWORK</div>
+                <div class="course-list">
+                    {% for cw in coursework %}
+                    <div class="course-row"><span class="arrow">→</span> {{ cw.name }}</div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="achievements" class="section section-achievements reveal">
+    <div class="container">
+        <div class="section-header">
+            <div class="section-label">// 05 — ACHIEVEMENTS</div>
+            <h2 class="section-title">Achievements &amp; Roles</h2>
+            <div class="section-divider"></div>
+        </div>
+        <div class="achievement-list">
+            {% for a in achievements %}
+            <div class="achievement-row">
+                <div class="achievement-num">{{ a.num }}</div>
+                <div class="achievement-text">{{ a.text }}</div>
+                <div class="achievement-badge {{ a.badge }}">{{ a.badge.split('-')[-1].upper() if '-' in a.badge else 'AWARD' }}</div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<section id="contact" class="section section-contact reveal">
+    <div class="container">
+        <div class="section-header">
+            <div class="section-label">// 06 — CONTACT</div>
+            <h2 class="section-title">Contact {{ profile.get('name', 'Suraj').split(' ')[0] }}</h2>
+            <div class="section-divider"></div>
+        </div>
+        <div class="contact-grid">
+            <div class="contact-left">
+                <div class="contact-card" id="contact-card">
+                    <form id="contact-form">
+                        <div class="form-field">
+                            <label for="name">NAME</label>
+                            <input type="text" id="name" name="name" autocomplete="name" required />
+                        </div>
+                        <div class="form-field">
+                            <label for="email">EMAIL</label>
+                            <input type="email" id="email" name="email" autocomplete="email" required />
+                        </div>
+                        <div class="form-field">
+                            <label for="subject">SUBJECT</label>
+                            <input type="text" id="subject" name="subject" required />
+                        </div>
+                        <div class="form-field">
+                            <label for="message">MESSAGE</label>
+                            <textarea id="message" name="message" rows="5" required></textarea>
+                        </div>
+                        <button type="submit" class="btn-submit">
+                            SEND MESSAGE
+                        </button>
+                        <div id="contact-error" class="form-error"></div>
+                    </form>
+                    <div id="contact-success" class="contact-success">
+                        <div class="success-icon">✓</div>
+                        <div class="success-title">MESSAGE SENT</div>
+                        <div class="success-text">{{ profile.get('name', 'Suraj').split(' ')[0] }} will get back to you soon.</div>
+                    </div>
+                </div>
+            </div>
+            <div class="contact-right">
+                <div id="contact-envelope-container" class="contact-envelope-container"></div>
+                <h3 class="contact-heading">GET IN TOUCH</h3>
+                <p class="contact-desc">
+                    Open to internships, collaborations, and interesting projects. Don't hesitate to reach out.
+                </p>
+                <div class="contact-list">
+                    <div class="contact-item" data-copy="{{ profile.get('email', '') }}">
+                        <div class="contact-label">EMAIL</div>
+                        <div class="contact-value">{{ profile.get('email', '') }}</div>
+                        <div class="copy-tooltip">Copied!</div>
+                    </div>
+                    <div class="contact-item" data-copy="{{ profile.get('phone', '') }}">
+                        <div class="contact-label">PHONE</div>
+                        <div class="contact-value">{{ profile.get('phone', '') }}</div>
+                        <div class="copy-tooltip">Copied!</div>
+                    </div>
+                    <div class="contact-item" data-copy="{{ profile.get('github', '') }}">
+                        <div class="contact-label">GITHUB</div>
+                        <div class="contact-value">{{ profile.get('github', '').replace('https://', '') }}</div>
+                        <div class="copy-tooltip">Copied!</div>
+                    </div>
+                    <div class="contact-item" data-copy="{{ profile.get('linkedin', '') }}">
+                        <div class="contact-label">LINKEDIN</div>
+                        <div class="contact-value">{{ profile.get('linkedin', '').replace('https://', '').replace('www.', '') }}</div>
+                        <div class="copy-tooltip">Copied!</div>
+                    </div>
+                </div>
+
+                <div class="contact-location-label">// CURRENTLY BASED IN</div>
+                <div class="contact-location-value">{{ profile.get('location', '') }}</div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+

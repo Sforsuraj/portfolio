@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+
+{% block nav %}
+<header class="nav">
+    <div class="nav-inner" style="justify-content: space-between;">
+        <div class="nav-left">
+            <span class="nav-logo-indicator" style="background: var(--green);"></span>
+            <span class="nav-logo-text">SURAJ_OS <span class="nav-logo-sub">ADMIN</span></span>
+        </div>
+        <div class="nav-right">
+            <a href="{{ url_for('admin') }}" class="btn btn-outline" style="margin-right: 16px;">RETURN TO ADMIN</a>
+            <a href="{{ url_for('admin_logout') }}" class="btn btn-primary">LOG OUT</a>
+        </div>
+    </div>
+</header>
+{% endblock %}
+
+{% block content %}
+<section class="section admin-section" style="padding-top: 120px;">
+    <div class="container">
+        <div class="section-header">
+            <div class="section-label">// {{ model_type|upper }} EDITOR</div>
+            <h2 class="section-title">Modify Data</h2>
+            <div class="section-divider"></div>
+        </div>
+
+        <div class="admin-card" style="margin-top: 32px;">
+            <form action="{{ url_for('admin_generic_edit', model_type=model_type, item_id=item.id) }}" method="post" class="admin-form">
+                
+                {% if model_type == 'skill' %}
+                <div class="form-field full-width">
+                    <label>NAME</label>
+                    <input type="text" name="name" value="{{ item.name }}" required>
+                </div>
+                <div class="form-field">
+                    <label>CATEGORY</label>
+                    <select name="category">
+                        <option value="LANGUAGES" {% if item.category == 'LANGUAGES' %}selected{% endif %}>LANGUAGES</option>
+                        <option value="ML_AI" {% if item.category == 'ML_AI' %}selected{% endif %}>ML / AI</option>
+                        <option value="TOOLS" {% if item.category == 'TOOLS' %}selected{% endif %}>TOOLS</option>
+                        <option value="DATABASES" {% if item.category == 'DATABASES' %}selected{% endif %}>DATABASES</option>
+                    </select>
+                </div>
+                <div class="form-field">
+                    <label>LEVEL (0-100)</label>
+                    <input type="number" name="level" value="{{ item.level }}" required>
+                </div>
+                
+                {% elif model_type == 'education' %}
+                <div class="form-field">
+                    <label>YEAR</label>
+                    <input type="text" name="year" value="{{ item.year }}" required>
+                </div>
+                <div class="form-field">
+                    <label>TITLE</label>
+                    <input type="text" name="title" value="{{ item.title }}" required>
+                </div>
+                <div class="form-field full-width">
+                    <label>INSTITUTION</label>
+                    <input type="text" name="institution" value="{{ item.institution }}" required>
+                </div>
+                <div class="form-field">
+                    <label>META (CGPA/%)</label>
+                    <input type="text" name="meta" value="{{ item.meta }}">
+                </div>
+                
+                {% elif model_type == 'experience' %}
+                <div class="form-field">
+                    <label>COMPANY</label>
+                    <input type="text" name="company" value="{{ item.company }}" required>
+                </div>
+                <div class="form-field">
+                    <label>ROLE</label>
+                    <input type="text" name="role" value="{{ item.role }}" required>
+                </div>
+                <div class="form-field">
+                    <label>DATE RANGE</label>
+                    <input type="text" name="date_range" value="{{ item.date_range }}" required>
+                </div>
+                <div class="form-field">
+                    <label>LOCATION</label>
+                    <input type="text" name="location" value="{{ item.location }}">
+                </div>
+                <div class="form-field full-width">
+                    <label>POINTS (ONE PER LINE)</label>
+                    <textarea name="points" rows="4">{{ item.points }}</textarea>
+                </div>
+                <div class="form-field full-width">
+                    <label>TAGS (CSV)</label>
+                    <input type="text" name="tags" value="{{ item.tags }}">
+                </div>
+                
+                {% elif model_type == 'achievement' %}
+                <div class="form-field">
+                    <label>NUMBER (e.g. 01)</label>
+                    <input type="text" name="num" value="{{ item.num }}" required>
+                </div>
+                <div class="form-field">
+                    <label>BADGE CLASS</label>
+                    <select name="badge">
+                        <option value="badge-gold" {% if item.badge == 'badge-gold' %}selected{% endif %}>GOLD</option>
+                        <option value="badge-cert" {% if item.badge == 'badge-cert' %}selected{% endif %}>CERT</option>
+                        <option value="badge-award" {% if item.badge == 'badge-award' %}selected{% endif %}>AWARD</option>
+                        <option value="badge-vol" {% if item.badge == 'badge-vol' %}selected{% endif %}>VOL</option>
+                        <option value="badge-amb" {% if item.badge == 'badge-amb' %}selected{% endif %}>AMB</option>
+                    </select>
+                </div>
+                <div class="form-field full-width">
+                    <label>TEXT</label>
+                    <input type="text" name="text" value="{{ item.text }}" required>
+                </div>
+                
+                {% elif model_type == 'certification' %}
+                <div class="form-field">
+                    <label>TITLE</label>
+                    <input type="text" name="title" value="{{ item.title }}" required>
+                </div>
+                <div class="form-field">
+                    <label>META</label>
+                    <input type="text" name="meta" value="{{ item.meta }}">
+                </div>
+                <div class="form-field full-width">
+                    <label>DESCRIPTION (TEXT)</label>
+                    <input type="text" name="text" value="{{ item.text }}" required>
+                </div>
+                
+                {% elif model_type == 'coursework' %}
+                <div class="form-field full-width">
+                    <label>NAME</label>
+                    <input type="text" name="name" value="{{ item.name }}" required>
+                </div>
+                {% endif %}
+                
+                <div class="form-field">
+                    <label>ORDER</label>
+                    <input type="number" name="order" value="{{ item.order }}">
+                </div>
+                
+                <div class="admin-btn-row">
+                    <button type="submit" class="btn btn-primary">UPDATE ELEMENT</button>
+                    <a href="{{ url_for('admin') }}" class="btn btn-outline" style="border-color: #444; color: #aaa;">CANCEL</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}

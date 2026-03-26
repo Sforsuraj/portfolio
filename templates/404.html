@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="section" style="min-height: 80vh; display: flex; align-items: center; justify-content: center; text-align: center;">
+    <div class="container">
+        <h1 style="font-size: 120px; color: var(--green); margin-bottom: 16px; letter-spacing: -4px;">404</h1>
+        <div class="section-label" style="justify-content: center; margin-bottom: 32px;">// 404 — PAGE NOT FOUND</div>
+        <p style="color: #a0a0a0; max-width: 400px; margin: 0 auto 32px;">The sequence you initiated returned an empty subset. The requested data node does not exist in the current grid.</p>
+        <a href="{{ url_for('index') }}" class="btn btn-primary">RETURN TO TERMINAL</a>
+    </div>
+</section>
+{% endblock %}
